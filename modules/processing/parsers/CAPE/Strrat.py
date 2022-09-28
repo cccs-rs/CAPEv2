@@ -21,12 +21,21 @@
 # SOFTWARE.
 
 import base64
+import tempfile
 import zipfile
 from hashlib import pbkdf2_hmac
 
 from Cryptodome.Cipher import AES
 
-from lib.cuckoo.common.utils import store_temp_file
+try:
+    HAVE_UTIL_LIB = True
+    from lib.cuckoo.common.utils import store_temp_file
+except ModuleNotFoundError as e:
+    print(f"Unable to import store_temp_file: {e}")
+    HAVE_UTIL_LIB = False
+
+AUTHOR = 'enzok'
+DESCRIPTION = "Strrat configuration parser"
 
 
 def unpad(s):
@@ -35,8 +44,10 @@ def unpad(s):
 
 def unzip_config(filepath):
     data = ""
+    if isinstance(filepath, bytes):
+        filepath = filepath.decode()
     try:
-        with zipfile.ZipFile(filepath.decode()) as z:
+        with zipfile.ZipFile(filepath) as z:
             for name in z.namelist():
                 if "config.txt" in name:
                     data = z.read(name)
@@ -71,17 +82,26 @@ def decode(data):
 def extract_config(data):
     raw_config = {}
     configdata = ""
-    tmpzip = store_temp_file(data, "badjar.zip", b"strrat_tmp")
-    configdata = unzip_config(tmpzip)
+    tmpzip = ""
+    if not HAVE_UTIL_LIB:
+        # Will write to a temporary file using tempfile lib
+        with tempfile.NamedTemporaryFile() as tmpzip:
+            tmpzip.write(data)
+            tmpzip.seek(0)
+            configdata = unzip_config(tmpzip.name)
+
+    else:
+        tmpzip = store_temp_file(data, "badjar.zip", b"strrat_tmp")
+        configdata = unzip_config(tmpzip)
 
     if configdata:
-        c2_1, mutex_1, dl_url, c2_2, mutex_2, startup_persist, secondary_persist, skype_persist, license = decode(configdata).split(
-            "|"
-        )
+        c2_1, mutex_1, dl_url, c2_2, mutex_2, startup_persist, secondary_persist, skype_persist, license = decode(
+            configdata).split("|")
+        raw_config['family'] = "Strrat"
         raw_config["tcp"] = [{"server_domain": c2_1, "usage": "c2"}, {"server_domain": c2_2, "usage": "c2"}]
         raw_config["http"] = [{"uri": dl_url, "usage": "download"}]
         raw_config["mutex"] = [mutex_1, mutex_2]
-        raw_config["other"]["license"] = license
+        raw_config.setdefault('other', {})["license"] = license
 
         if startup_persist == "true":
             raw_config.setdefault("capability_enabled", []).append("Setup Startup Folder Persistence")
