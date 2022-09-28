@@ -5,9 +5,9 @@
 import datetime
 import hashlib
 import logging
-from modulefinder import Module
 import socket
 import struct
+from modulefinder import Module
 
 import pefile
 from Cryptodome.Cipher import ARC4
@@ -86,8 +86,8 @@ def parse_binary_c2(data):
     length = len(data)
     controllers = []
     for c2_offset in range(0, length, 7):
-        ip = socket.inet_ntoa(struct.pack("!L", struct.unpack(">I", data[c2_offset + 1: c2_offset + 5])[0]))
-        port = str(struct.unpack(">H", data[c2_offset + 5: c2_offset + 7])[0])
+        ip = socket.inet_ntoa(struct.pack("!L", struct.unpack(">I", data[c2_offset + 1 : c2_offset + 5])[0]))
+        port = str(struct.unpack(">H", data[c2_offset + 5 : c2_offset + 7])[0])
         controllers.append(f"{ip}:{port}")
     return controllers
 
@@ -110,8 +110,8 @@ def parse_binary_c2_2(data):
 
     controllers = []
     for c2_offset in range(0, length, 7):
-        ip = socket.inet_ntoa(struct.pack("!L", struct.unpack(">I", c2_data[c2_offset + 1: c2_offset + 5])[0]))
-        port = str(struct.unpack(">H", c2_data[c2_offset + 5: c2_offset + 7])[0])
+        ip = socket.inet_ntoa(struct.pack("!L", struct.unpack(">I", c2_data[c2_offset + 1 : c2_offset + 5])[0]))
+        port = str(struct.unpack(">H", c2_data[c2_offset + 5 : c2_offset + 7])[0])
         controllers.append(f"{ip}:{port}")
     return controllers
 
@@ -187,7 +187,7 @@ def extract_config(filebuf):
                     config = {}
                     offset = entry.directory.entries[0].data.struct.OffsetToData
                     size = entry.directory.entries[0].data.struct.Size
-                    res_data = pe.get_memory_mapped_image()[offset: offset + size]
+                    res_data = pe.get_memory_mapped_image()[offset : offset + size]
                     if str(entry.name) == "307":
                         # we found the parent process and still need to decrypt/(blzpack) decompress the main DLL
                         dec_bytes = decrypt_data(res_data)
@@ -199,7 +199,7 @@ def extract_config(filebuf):
                                 if entry.name is not None:
                                     offset = entry.directory.entries[0].data.struct.OffsetToData
                                     size = entry.directory.entries[0].data.struct.Size
-                                    res_data = pe2.get_memory_mapped_image()[offset: offset + size]
+                                    res_data = pe2.get_memory_mapped_image()[offset : offset + size]
                                     if str(entry.name) == "308":
                                         dec_bytes = decrypt_data(res_data)
                                         config = parse_config(dec_bytes)

@@ -34,7 +34,7 @@ except ModuleNotFoundError as e:
     print(f"Unable to import store_temp_file: {e}")
     HAVE_UTIL_LIB = False
 
-AUTHOR = 'enzok'
+AUTHOR = "enzok"
 DESCRIPTION = "Strrat configuration parser"
 
 
@@ -95,13 +95,14 @@ def extract_config(data):
         configdata = unzip_config(tmpzip)
 
     if configdata:
-        c2_1, mutex_1, dl_url, c2_2, mutex_2, startup_persist, secondary_persist, skype_persist, license = decode(
-            configdata).split("|")
-        raw_config['family'] = "Strrat"
+        c2_1, mutex_1, dl_url, c2_2, mutex_2, startup_persist, secondary_persist, skype_persist, license = decode(configdata).split(
+            "|"
+        )
+        raw_config["family"] = "Strrat"
         raw_config["tcp"] = [{"server_domain": c2_1, "usage": "c2"}, {"server_domain": c2_2, "usage": "c2"}]
         raw_config["http"] = [{"uri": dl_url, "usage": "download"}]
         raw_config["mutex"] = [mutex_1, mutex_2]
-        raw_config.setdefault('other', {})["license"] = license
+        raw_config.setdefault("other", {})["license"] = license
 
         if startup_persist == "true":
             raw_config.setdefault("capability_enabled", []).append("Setup Startup Folder Persistence")
