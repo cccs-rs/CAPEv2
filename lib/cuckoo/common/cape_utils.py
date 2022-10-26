@@ -53,8 +53,7 @@ def load_mwcp_parsers() -> Tuple[Dict[str, str], ModuleType]:
 
         logging.getLogger("mwcp").setLevel(logging.CRITICAL)
         mwcp.register_parser_directory(os.path.join(CUCKOO_ROOT, process_cfg.mwcp.modules_path))
-        _malware_parsers = {block.name.rsplit(".", 1)[-1]: block.name
-                            for block in mwcp.get_parser_descriptions(config_only=False)}
+        _malware_parsers = {block.name.rsplit(".", 1)[-1]: block.name for block in mwcp.get_parser_descriptions(config_only=False)}
         assert "MWCP_TEST" in _malware_parsers
         return _malware_parsers, mwcp
     except ImportError as e:
@@ -76,8 +75,7 @@ def load_malwareconfig_parsers() -> Tuple[bool, dict, ModuleType]:
         if process_cfg.ratdecoders.modules_path:
             from lib.cuckoo.common.load_extra_modules import ratdecodedr_load_decoders
 
-            ratdecoders_local_modules = ratdecodedr_load_decoders([os.path.join(CUCKOO_ROOT,
-                                                                                process_cfg.ratdecoders.modules_path)])
+            ratdecoders_local_modules = ratdecodedr_load_decoders([os.path.join(CUCKOO_ROOT, process_cfg.ratdecoders.modules_path)])
             if ratdecoders_local_modules:
                 __decoders__.update(ratdecoders_local_modules)
             assert "TestRats" in __decoders__
@@ -244,12 +242,12 @@ def prettify_maco_output(raw_config: dict) -> dict:
         if not isinstance(data, dict):
             return data
         # Simple representation
-        return ','.join([f"{k}={v}" for k, v in data.items()])
+        return ",".join([f"{k}={v}" for k, v in data.items()])
 
     for k, v in raw_config.items():
         if isinstance(v, list) and (v and isinstance(v[0], dict)):
             # Binaries
-            if k == 'binaries':
+            if k == "binaries":
                 # Put data on one line; separate by type of binary
                 for i in v:
                     flat_config.setdefault(f"{k}_{i.get('datatype', 'other')}", []).append(
@@ -257,128 +255,143 @@ def prettify_maco_output(raw_config: dict) -> dict:
                         f"Data: {i.get('data')}; "
                         f"Other: {simple_representation(i.get('other'))}"
                     )
-            elif k == 'ftp':
+            elif k == "ftp":
                 # FTP connections
                 for i in v:
                     auth = f"{i.get('username', '')}:{i.get('password')}"
                     conn = f"ftp://{i.get('hostname', '<NO_HOST>')}:{i.get('port', 21)}/{i.get('path', '')}"
-                    if auth != ':':
-                        conn.replace('://', f"://{auth}@")
+                    if auth != ":":
+                        conn.replace("://", f"://{auth}@")
                     flat_config.setdefault(f"{k}_{i.get('usage', 'other')}", []).append(conn)
-            elif k == 'smtp':
+            elif k == "smtp":
                 # SMTP connections
                 for i in v:
                     auth = f"{i.get('username', '')}:{i.get('password')}"
-                    uri = i.get('uri', "smtp://{hostname}:{port}".format(
-                        hostname=i.get('hostname', '<NO_HOST>'),
-                        port=i.get('port', 587),
-                    ))
+                    uri = i.get(
+                        "uri",
+                        "smtp://{hostname}:{port}".format(
+                            hostname=i.get("hostname", "<NO_HOST>"),
+                            port=i.get("port", 587),
+                        ),
+                    )
 
-                    if auth != ':':
-                        uri.replace('://', f"://{auth}@")
+                    if auth != ":":
+                        uri.replace("://", f"://{auth}@")
 
                     conn = "From: {mail_from}, To: {mail_to}, Subject: {subject} ({uri})".format(
-                        mail_from=i.get('mail_from', ""),
-                        mail_to=i.get('mail_to', ""),
-                        subject=i.get('subject', ""),
+                        mail_from=i.get("mail_from", ""),
+                        mail_to=i.get("mail_to", ""),
+                        subject=i.get("subject", ""),
                         uri=uri,
                     )
                     flat_config.setdefault(f"{k}_{i.get('usage', 'other')}", []).append(conn)
-            elif k == 'http':
+            elif k == "http":
                 # HTTP connections
                 for i in v:
                     auth = f"{i.get('username', '')}:{i.get('password')}"
-                    protocol = i.get('protocol', 'http')
-                    uri = i.get('uri', "{protocol}://{hostname}:{port}/{path}?{query}#{fragment}".format(
-                        protocol=protocol,
-                        hostname=i.get('hostname', '<NO_HOST>'),
-                        port=i.get('port', 80 if protocol == 'http' else 443),
-                        path=i.get('path', ''),
-                        query=i.get('query', ''),
-                        fragment=i.get('fragment', '')
-                    ))
+                    protocol = i.get("protocol", "http")
+                    uri = i.get(
+                        "uri",
+                        "{protocol}://{hostname}:{port}/{path}?{query}#{fragment}".format(
+                            protocol=protocol,
+                            hostname=i.get("hostname", "<NO_HOST>"),
+                            port=i.get("port", 80 if protocol == "http" else 443),
+                            path=i.get("path", ""),
+                            query=i.get("query", ""),
+                            fragment=i.get("fragment", ""),
+                        ),
+                    )
 
-                    if auth != ':':
-                        uri.replace('://', f"://{auth}@")
+                    if auth != ":":
+                        uri.replace("://", f"://{auth}@")
 
                     conn = "{method} {uri} (User-Agent: {user_agent}; Headers: {headers})".format(
-                        method=i.get('method', 'GET'),
+                        method=i.get("method", "GET"),
                         uri=uri,
-                        user_agent=i.get('user_agent'),
-                        headers=simple_representation(i.get('header'))
+                        user_agent=i.get("user_agent"),
+                        headers=simple_representation(i.get("header")),
                     )
                     flat_config.setdefault(f"{k}_{i.get('usage', 'other')}", []).append(conn)
-            elif k == 'ssh':
+            elif k == "ssh":
                 # SSH connections
                 for i in v:
                     auth = f"{i.get('username', '')}:{i.get('password')}"
-                    uri = i.get('uri', "ssh://{hostname}:{port}".format(
-                        hostname=i.get('hostname', '<NO_HOST>'),
-                        port=i.get('port', 80 if protocol == 'http' else 443),
-                    ))
+                    uri = i.get(
+                        "uri",
+                        "ssh://{hostname}:{port}".format(
+                            hostname=i.get("hostname", "<NO_HOST>"),
+                            port=i.get("port", 80 if protocol == "http" else 443),
+                        ),
+                    )
 
-                    if auth != ':':
-                        uri.replace('://', f"://{auth}@")
+                    if auth != ":":
+                        uri.replace("://", f"://{auth}@")
 
-                    conn = "{uri} PBK: {public_key}".format(public_key=i.get('public_key', ''), uri=uri,)
+                    conn = "{uri} PBK: {public_key}".format(
+                        public_key=i.get("public_key", ""),
+                        uri=uri,
+                    )
                     flat_config.setdefault(f"{k}_{i.get('usage', 'other')}", []).append(conn)
-            elif k == 'proxy':
+            elif k == "proxy":
                 # Proxy connections
                 for i in v:
                     auth = f"{i.get('username', '')}:{i.get('password')}"
-                    uri = i.get('uri', "{protocol}://{hostname}:{port}".format(
-                        hostname=i.get('hostname', '<NO_HOST>'),
-                        port=i.get('port', 80 if protocol == 'http' else 443),
-                        protocol=i.get('protocol', 'http')
-                    ))
+                    uri = i.get(
+                        "uri",
+                        "{protocol}://{hostname}:{port}".format(
+                            hostname=i.get("hostname", "<NO_HOST>"),
+                            port=i.get("port", 80 if protocol == "http" else 443),
+                            protocol=i.get("protocol", "http"),
+                        ),
+                    )
 
-                    if auth != ':':
-                        uri.replace('://', f"://{auth}@")
+                    if auth != ":":
+                        uri.replace("://", f"://{auth}@")
                     flat_config.setdefault(f"{k}_{i.get('usage', 'other')}", []).append(uri)
-            elif k == 'dns':
+            elif k == "dns":
                 # DNS server connections
                 for i in v:
                     flat_config.setdefault(f"{k}_{i.get('usage', 'other')}", []).append(
                         f"{i.get('ip', '<NO_IP>')}:{i.get('port', 53)}"
                     )
-            elif k == 'tcp' or k == 'udp':
+            elif k == "tcp" or k == "udp":
                 # General TCP/UDP connections
                 for i in v:
                     conn = "{client_ip}:{client_port} → {server_host}:{server_port}; Domain: {server_domain}".format(
-                        client_ip=i.get('client_ip', '<NO_SRC_IP>'),
-                        client_port=i.get('client_port', '<NO_SRC_PORT>'),
-                        server_host=i.get('server_ip', i.get('server_domain', '<NO_DST_IP>')),
-                        server_port=i.get('server_port', '<NO_DST_PORT>'),
-                        server_domain=i.get('server_domain', i.get('server_domain', '<NO_DST_DOMAIN>'))
+                        client_ip=i.get("client_ip", "<NO_SRC_IP>"),
+                        client_port=i.get("client_port", "<NO_SRC_PORT>"),
+                        server_host=i.get("server_ip", i.get("server_domain", "<NO_DST_IP>")),
+                        server_port=i.get("server_port", "<NO_DST_PORT>"),
+                        server_domain=i.get("server_domain", i.get("server_domain", "<NO_DST_DOMAIN>")),
                     )
                     flat_config.setdefault(f"{k}_{i.get('usage', 'other')}", []).append(conn)
-            elif k == 'encryption':
+            elif k == "encryption":
                 # Encryptions
                 for i in v:
                     flat_config.setdefault(f"{k}_{i.get('usage', 'other')}", []).append(simple_representation(i))
-            elif k == 'service':
+            elif k == "service":
                 # System Services
                 flat_config.setdefault(k, []).extend([simple_representation(i) for i in v])
-            elif k == 'cryptocurrency':
+            elif k == "cryptocurrency":
                 # Cryptocurrency Activity
                 for i in v:
                     flat_config.setdefault(f"{k}_{i.get('usage', 'other')}", []).append(
-                        "{ransom} {currency} → {address}".format(ransom=i.get('ransom_amount', '?'),
-                                                                 currency=i.get('coin', '?'),
-                                                                 address=i.get('address', '<UNKNOWN_WALLET>'))
+                        "{ransom} {currency} → {address}".format(
+                            ransom=i.get("ransom_amount", "?"),
+                            currency=i.get("coin", "?"),
+                            address=i.get("address", "<UNKNOWN_WALLET>"),
+                        )
                     )
-            elif k == 'paths':
+            elif k == "paths":
                 # System Paths
                 for i in v:
-                    flat_config.setdefault(f"{k}_{i.get('usage', 'other')}", []).append(i.get('path', ''))
-            elif k == 'registry':
+                    flat_config.setdefault(f"{k}_{i.get('usage', 'other')}", []).append(i.get("path", ""))
+            elif k == "registry":
                 # Registry Keys
                 for i in v:
-                    flat_config.setdefault(f"{k}_{i.get('usage', 'other')}", []).append(
-                        f"{i.get('key', '')}={i.get('value', '')}"
-                    )
+                    flat_config.setdefault(f"{k}_{i.get('usage', 'other')}", []).append(f"{i.get('key', '')}={i.get('value', '')}")
 
-        elif isinstance(v, dict) and k == 'other':
+        elif isinstance(v, dict) and k == "other":
             flat_config.update(v)
         else:
             flat_config[k] = v
