@@ -5,6 +5,9 @@ from zipfile import BadZipFile, ZipFile
 
 from Cryptodome.Cipher import ARC4
 
+DESCRIPTION = "unrecom configuration parser."
+AUTHOR = "CAPE"
+
 
 def extract_embedded(zip_data):
     raw_embedded = None

@@ -2,6 +2,9 @@ import os
 
 import pefile
 
+DESCRIPTION = "Pandora configuration parser."
+AUTHOR = "CAPE"
+
 
 def version_21(raw_config):
     if raw_config is None:
@@ -62,13 +65,15 @@ def version_22(raw_config):
 def get_config(data):
     try:
         pe = pefile.PE(data=data)
-        rt_string_idx = [entry.id for entry in pe.DIRECTORY_ENTRY_RESOURCE.entries].index(pefile.RESOURCE_TYPE["RT_RCDATA"])
+        rt_string_idx = [
+            entry.id for entry in pe.DIRECTORY_ENTRY_RESOURCE.entries].index(
+            pefile.RESOURCE_TYPE["RT_RCDATA"])
         rt_string_directory = pe.DIRECTORY_ENTRY_RESOURCE.entries[rt_string_idx]
         for entry in rt_string_directory.directory.entries:
             if str(entry.name) == "CFG":
                 data_rva = entry.directory.entries[0].data.struct.OffsetToData
                 size = entry.directory.entries[0].data.struct.Size
-                data = pe.get_memory_mapped_image()[data_rva : data_rva + size]
+                data = pe.get_memory_mapped_image()[data_rva: data_rva + size]
                 cleaned = data.replace("\x00", "")
                 return cleaned.split("##")
     except Exception:

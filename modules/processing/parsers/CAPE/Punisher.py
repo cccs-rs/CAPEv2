@@ -1,5 +1,8 @@
 import os
 
+DESCRIPTION = "Punisher configuration parser."
+AUTHOR = "CAPE"
+
 
 def extract_config(data):
     config = {}

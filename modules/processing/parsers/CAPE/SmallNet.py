@@ -1,6 +1,9 @@
 import os
 from gettext import install
 
+DESCRIPTION = "SmallNet configuration parser."
+AUTHOR = "CAPE"
+
 
 def ver_52(data):
     config_parts = data.split("!!<3SAFIA<3!!")
