@@ -21,7 +21,21 @@ DESCRIPTION = "UrsnifV3 configuration parser."
 AUTHOR = "kevoreilly"
 
 MAX_STRING_SIZE = 256
-
+rule_source = """
+rule UrsnifV3
+{
+    meta:
+        author = "kevoreilly"
+        description = "UrsnifV3 Payload"
+        cape_type = "UrsnifV3 Payload"
+    strings:
+        $crypto32_1 = {8B C3 83 EB 01 85 C0 75 0D 0F B6 16 83 C6 01 89 74 24 14 8D 58 07 8B C2 C1 E8 07 83 E0 01 03 D2 85 C0 0F 84 AB 01 00 00 8B C3 83 EB 01 85 C0 89 5C 24 20 75 13 0F B6 16 83 C6 01 BB 07 00 00 00}
+        $crypto32_2 = {8B 45 EC 0F B6 38 FF 45 EC 33 C9 41 8B C7 23 C1 40 40 D1 EF 75 1B 89 4D 08 EB 45}
+        $cape_string = "cape_options"
+    condition:
+        uint16(0) == 0x5A4D and 1 of ($crypto32_*) and not $cape_string
+}
+"""
 # JOINER_SECTIONS = {
 #     0xE1285E64: "CRC_PUBLIC_KEY",
 #     0x8FB1DDE1: "CRC_CLIENT_INI",
@@ -88,7 +102,7 @@ SECTION_KEYS = {
 
 
 def string_from_offset(buffer, offset):
-    return buffer[offset : offset + MAX_STRING_SIZE].split(b"\0", 1)[0].decode()
+    return buffer[offset: offset + MAX_STRING_SIZE].split(b"\0", 1)[0].decode()
 
 
 def get_config_item(config, offset):
@@ -99,8 +113,8 @@ def get_config_item(config, offset):
 def convert_pubkey(pub):
     # bit = struct.unpack_from('<I', pub)[0]
     bit = 0x200
-    mod = pub[4 : (bit / 8) + 4]
-    exp = pub[(bit / 8) + 4 :]
+    mod = pub[4: (bit / 8) + 4]
+    exp = pub[(bit / 8) + 4:]
 
     mod = int(binascii.hexlify(mod), 16)
     exp = int(binascii.hexlify(exp), 16)
@@ -125,10 +139,10 @@ def extract_config(raw_data):
         section_count = 0
         section_offset = 8
         while section_count < number_of_sections:
-            section_key = struct.unpack("I", raw_data[section_offset : section_offset + 4])[0]
-            section_type = struct.unpack("I", raw_data[section_offset + 4 : section_offset + 8])[0]
+            section_key = struct.unpack("I", raw_data[section_offset: section_offset + 4])[0]
+            section_type = struct.unpack("I", raw_data[section_offset + 4: section_offset + 8])[0]
             if section_type == 1:
-                data_offset = struct.unpack("I", raw_data[section_offset + 8 : section_offset + 12])[0]
+                data_offset = struct.unpack("I", raw_data[section_offset + 8: section_offset + 12])[0]
                 config_item = get_config_item(raw_data, section_offset + data_offset)
                 if config_item == "":
                     section_count += 1
@@ -143,12 +157,12 @@ def extract_config(raw_data):
 
     elif dword2 == 0:
         section_offset = 8
-        section_key = struct.unpack("I", raw_data[section_offset : section_offset + 4])[0]
-        section_type = struct.unpack("I", raw_data[section_offset + 4 : section_offset + 8])[0]
+        section_key = struct.unpack("I", raw_data[section_offset: section_offset + 4])[0]
+        section_type = struct.unpack("I", raw_data[section_offset + 4: section_offset + 8])[0]
         while section_type == 1:
-            section_key = struct.unpack("I", raw_data[section_offset : section_offset + 4])[0]
-            section_type = struct.unpack("I", raw_data[section_offset + 4 : section_offset + 8])[0]
-            data_offset = struct.unpack("I", raw_data[section_offset + 8 : section_offset + 12])[0]
+            section_key = struct.unpack("I", raw_data[section_offset: section_offset + 4])[0]
+            section_type = struct.unpack("I", raw_data[section_offset + 4: section_offset + 8])[0]
+            data_offset = struct.unpack("I", raw_data[section_offset + 8: section_offset + 12])[0]
             config_item = get_config_item(raw_data, section_offset + data_offset)
             if config_item == "":
                 section_offset += 24
