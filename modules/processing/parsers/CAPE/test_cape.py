@@ -1,7 +1,7 @@
 DESCRIPTION = "[TEST] CAPE configuration parser."
 AUTHOR = "CAPE"
 
-#BLAHBLAHx2accd
+#BLAHBLAHx2accde
 
 def extract_config(data: bytes):
     pass
