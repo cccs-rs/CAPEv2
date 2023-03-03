@@ -68,11 +68,13 @@ def extract_config(filebuf):
         if c2_address:
             # Based on other extractors, this is the domain?
             http["hostname"] = c2_address
+            http["usage"] = "c2"
 
         # Assuming c2_url is related to c2_address
         c2_url = string_from_offset(filebuf, yara_offset + 0xE8)
         if c2_url:
             http["uri"] = c2_url
+            http["usage"] = "c2"
 
         if filebuf[yara_offset + 0x13B0 : yara_offset + 0x13B1] == "S":
             registrypath = string_from_offset(filebuf, yara_offset + 0x13B0)

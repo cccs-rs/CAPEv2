@@ -200,7 +200,7 @@ def extract_config(filebuf):
                     config.setdefault("other", {})[idx_list[i]] = base64.b64encode(cont)
                 elif i == 0:
                     host, port, password = cont.split(b"|", 1)[0].decode().split(":")
-                    config.setdefault("tcp", []).append({"server_ip": host, "server_port": port, "usage": "other"})
+                    config.setdefault("tcp", []).append({"server_ip": host, "server_port": port, "usage": "c2"})
                     config.setdefault("password", []).append(password)
                 else:
                     p_data[idx_list[i]] = cont.decode()

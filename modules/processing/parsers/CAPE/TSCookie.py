@@ -87,7 +87,7 @@ def parse_config(config):
             main_port = unpack_from("<H", config, 0x4 + 0x100 * i)[0]
             backup_port = unpack_from("<H", config, 0x8 + 0x100 * i)[0]
             config_dict.setdefault("tcp", []).extend(
-                [{"server_domain": server_name, "server_port": port} for port in [main_port, backup_port]]
+                [{"server_domain": server_name, "server_port": port, "usage": "c2"} for port in [main_port, backup_port]]
             )
     if config[0x400] != "\x00":
         config_dict["proxy"] = [

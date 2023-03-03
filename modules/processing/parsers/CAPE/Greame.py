@@ -38,7 +38,7 @@ def parse_config(raw_config):
     for x in range(19):
         if len(raw_config[x]) > 1:
             domain, port = xor_decode(raw_config[x]).split(":", 2)
-            config.setdefault("tcp", []).append({"server_domain": domain, "server_port": port})
+            config.setdefault("tcp", []).append({"server_domain": domain, "server_port": port, "usage": "c2"})
     config["identifier"] = xor_decode(raw_config[20])  # Server ID
     config["passwords"] = [xor_decode(raw_config[n]) for n in [21, 73]]  # Password, Google Chrome Passwords
     config["ftp"] = (

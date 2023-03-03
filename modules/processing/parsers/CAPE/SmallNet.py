@@ -12,7 +12,7 @@ def ver_52(data):
         "category": ["rat"],
         "version": "5.2",
         "tcp": [
-            {"server_domain": config_parts[1], "server_port": config_parts[2]},
+            {"server_domain": config_parts[1], "server_port": config_parts[2], "usage": "c2"},
             {"server_domain": config_parts[5], "usage": "c2"},  # Install Server
         ],
         "registry": [{"key": config_parts[8]}],
@@ -80,7 +80,7 @@ def ver_5(data):
         "category": ["rat"],
         "version": "5",
         "tcp": [
-            {"server_domain": config_parts[1], "server_port": config_parts[2]},
+            {"server_domain": config_parts[1], "server_port": config_parts[2], "usage": "c2"},
             {"server_domain": config_parts[5], "usage": "c2"},  # Install Server
         ],
         "registry": [{"key": config_parts[8]}],

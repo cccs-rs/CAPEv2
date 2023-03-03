@@ -156,7 +156,7 @@ def decoder(data):
 def extract_config(filebuf):
     urls = decoder(filebuf)
     if urls:
-        return {"family": "LokiBot", "http": [{"uri": url.decode(), "usage": "other"} for url in urls]}
+        return {"family": "LokiBot", "http": [{"uri": url.decode(), "usage": "c2"} for url in urls]}
 
 
 if __name__ == "__main__":
