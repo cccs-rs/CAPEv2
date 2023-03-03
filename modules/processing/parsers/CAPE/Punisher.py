@@ -10,7 +10,7 @@ def extract_config(data):
     if len(config_parts) <= 5:
         return None
 
-    config["tcp"] = [{"server_domain": config_parts[1].decode(), "server_port": config_parts[2].decode()}]
+    config["tcp"] = [{"server_domain": config_parts[1].decode(), "server_port": config_parts[2].decode(), "usage":"c2"}]
     config["campaign_id"] = [config_parts[3].decode()]
     config["password"] = [config_parts[8].decode()]
     config["registry"] = [{"key": config_parts[7].decode()}]

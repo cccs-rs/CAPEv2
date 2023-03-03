@@ -233,7 +233,7 @@ def extract_config(filebuf):
                     # log.info("controllers: %s", controllers)
                     for controller in controllers:
                         ip, port = controller.split(":", 1)
-                        end_config.setdefault("tcp", []).append({"server_ip": ip, "server_port": port})
+                        end_config.setdefault("tcp", []).append({"server_ip": ip, "server_port": port, "usage":"c2"})
     except Exception as e:
         log.warning(e)
 

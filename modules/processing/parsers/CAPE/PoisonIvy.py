@@ -74,7 +74,7 @@ def extract_final_config(config_raw):
             config.setdefault("campaign_id", []).append(clean_string(field[1]))
         elif field[0] == "9001":
             config.setdefault("tcp", []).extend(
-                [{"server_domain": domain, "server_port": port} for domain, port in walk_domain(field[1])]
+                [{"server_domain": domain, "server_port": port, "usage": "c2"} for domain, port in walk_domain(field[1])]
             )
         elif field[0] == "4501":
             config.setdefault("password", []).append(clean_string(field[1]))

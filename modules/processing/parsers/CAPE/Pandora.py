@@ -41,7 +41,7 @@ def version_22(raw_config):
         "family": "Pandora",
         "version": "2.2",
         "campaign_id": raw_config[15],
-        "tcp": [{"server_domain": raw_config[0], "server_port": raw_config[1]}],
+        "tcp": [{"server_domain": raw_config[0], "server_port": raw_config[1], "usage": "c2"}],
         "password": [raw_config[2]],
         "paths": [
             {"path": os.path.join(raw_config[3], raw_config[4]), "usage": "install"},

@@ -78,7 +78,7 @@ def extract_config(filebuf):
     for item in items:
         item = item.lstrip(b"\x00")
         if item.startswith(b"http"):
-            end_config.setdefault("http", []).append({"uri": item})
+            end_config.setdefault("http", []).append({"uri": item, "usage": "c2"})
         elif len(item) == 16:
             end_config["encryption"] = [{"algorithm": "RC4", "key": item}]
     return end_config
