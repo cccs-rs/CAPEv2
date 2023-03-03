@@ -517,7 +517,7 @@ def beacon_settings_to_maco(output: dict):
                 "port": port,
                 "path": c2_get_path,
                 "method": output.pop("HttpGet_Verb", "GET"),
-                "usage":"c2"
+                "usage": "c2",
             }
             http_get.update({"user_agent": user_agent}) if user_agent else None
             http.append(http_get)
@@ -529,7 +529,7 @@ def beacon_settings_to_maco(output: dict):
                     "port": port,
                     "path": c2_post_path,
                     "method": output.pop("HttpPost_Verb", "POST"),
-                    "usage":"c2"
+                    "usage": "c2",
                 }
                 http_post.update({"user_agent": user_agent}) if user_agent else None
                 http.append(http_post)

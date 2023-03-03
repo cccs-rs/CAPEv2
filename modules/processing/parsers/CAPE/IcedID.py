@@ -77,7 +77,7 @@ def extract_config(filebuf):
                             "family": "IcedID",
                             "version": str(struct.unpack("I", decrypted_data[4:8])[0]),
                             "paths": [{"path": config[1], "usage": "other"}],
-                            "http": [{"uri": controller[1:], "usage" : "c2"} for controller in config[2:]],
+                            "http": [{"uri": controller[1:], "usage": "c2"} for controller in config[2:]],
                             "other": {
                                 "Bot ID": str(struct.unpack("I", decrypted_data[:4])[0]),
                             },

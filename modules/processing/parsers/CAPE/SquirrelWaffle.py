@@ -72,7 +72,9 @@ def extract_config(data):
                     if "\r\n" in decrypted and "|" not in decrypted:
                         config["IP Blocklist"] = list(filter(None, decrypted.split("\r\n")))
                     elif "|" in decrypted and "." in decrypted and "\r\n" not in decrypted:
-                        config.setdefault("http", []).extend([{"uri": uri, "usage": "c2"} for uri in list(filter(None, decrypted.split("|")))])
+                        config.setdefault("http", []).extend(
+                            [{"uri": uri, "usage": "c2"} for uri in list(filter(None, decrypted.split("|")))]
+                        )
                 except Exception:
                     continue
         matches = yara_rules.match(data=data)

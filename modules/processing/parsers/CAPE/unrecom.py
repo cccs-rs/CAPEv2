@@ -54,7 +54,7 @@ def parse_config(config):
         else:
             raw_config[child.attrib["key"]] = child.text
     return {
-        "family": ["unrecom","AdWind"],
+        "family": ["unrecom", "AdWind"],
         "version": raw_config["Version"],
         "sleep_delay": [raw_config["delay"]],
         "password": [raw_config["password"]],
