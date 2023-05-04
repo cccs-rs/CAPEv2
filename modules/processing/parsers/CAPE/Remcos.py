@@ -195,13 +195,19 @@ def extract_config(filebuf):
                     # Flag capabilities that are enabled/disabled whether known or not
                     config.setdefault(f"capability_{FLAG[cont].lower()}", []).append(idx_list[i])
                 elif i in (9, 16, 25, 37):
-                    p_data[idx_list[i]] = setup_list[int(cont)]
+                    # observed config values in bytes instead of ascii
+                    if cont[0] > 8:
+                        p_data[idx_list[i]] = setup_list[int(chr(cont[0]))]
+                    else:
+                        p_data[idx_list[i]] = setup_list[cont[0]]
                 elif i in (56, 57, 58):
                     config.setdefault("other", {})[idx_list[i]] = base64.b64encode(cont)
                 elif i == 0:
-                    host, port, password = cont.split(b"|", 1)[0].decode().split(":")
-                    config.setdefault("tcp", []).append({"server_ip": host, "server_port": port, "usage": "c2"})
-                    config.setdefault("password", []).append(password)
+                    # various separators have been observed
+                    separator = next((x for x in (b'|', b'\x1e', b'\xff\xff\xff\xff') if x in cont))
+                    host, port, password = cont.split(separator, 1)[0].split(b":")
+                    config.setdefault("tcp", []).append({"server_ip": host.decode(), "server_port": port.decode(), "usage": "c2"})
+                    config.setdefault("password", []).append(password.decode())
                 else:
                     p_data[idx_list[i]] = cont.decode()
 
@@ -228,7 +234,11 @@ def extract_config(filebuf):
 
             for k, v in p_data.items():
                 if k in utf_16_string_list:
-                    v = v.decode("utf16").strip("\00")
+                    try:
+                        v = v.decode("utf16").strip("\00")
+                    except AttributeError as e:
+                        # remcos str
+                        pass
                 config.setdefault("other", {})[k] = v
 
     except pefile.PEFormatError:
