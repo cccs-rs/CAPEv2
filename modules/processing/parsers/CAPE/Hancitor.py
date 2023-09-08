@@ -30,6 +30,7 @@ rule Hancitor
 }
 """
 
+
 def getHashKey(key_data):
     # source: https://github.com/OALabs/Lab-Notes/blob/main/Hancitor/hancitor.ipynb
     m = hashlib.sha1()
