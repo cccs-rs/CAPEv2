@@ -23,7 +23,7 @@ def extract_config(data):
         for section in pe.sections:
             if b".data" in section.Name:
                 data = section.get_data()
-                if CFG_START != hexlify(unpack_from(">8s", data, offset=8)[0]):
+                if not data or CFG_START != hexlify(unpack_from(">8s", data, offset=8)[0]):
                     return None
                 rc4_seed = bytes(bytearray(unpack_from(">8B", data, offset=24)))
                 key = md5(rc4_seed).digest()[:5]
