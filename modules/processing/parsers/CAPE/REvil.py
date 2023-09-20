@@ -35,6 +35,7 @@ def getREvilKeyAndConfig(pesections, section_name):
                 key = data[:32]
                 encoded_config = data[32:]
                 return key, encoded_config
+    return None, None
 
 
 def decodeREvilConfig(config_key, config_data):
