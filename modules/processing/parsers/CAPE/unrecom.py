@@ -20,7 +20,7 @@ def extract_embedded(zip_data):
                     enckey = f"{partial_key}DESW7OWKEJRU4P2K"  # complete key
                 if name == "load/MANIFEST.MF":  # this is the embedded jar
                     raw_embedded = zip.read(name)
-    except BadZipFile:
+    except (BadZipFile, ValueError):
         # File is not a zip
         pass
     if raw_embedded is None:
