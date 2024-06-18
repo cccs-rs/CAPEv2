@@ -1,7 +1,54 @@
 from contextlib import suppress
 
 from lib.cuckoo.common.integrations.strings import extract_strings
+from maco.model import ExtractorModel as MACOModel
 
+def convert_to_MACO(raw_config: dict) -> MACOModel:
+    parsed_result = MACOModel(family="AgentTesla")
+    protocol = raw_config.get('Protocol')
+    if not protocol:
+        return
+    elif protocol == "Telegram":
+        parsed_result.http.append(
+            MACOModel.Http(uri=raw_config["C2"],
+                           password=raw_config["Password"],
+                           usage="c2")
+        )
+
+    elif protocol in ["HTTP(S)", "Discord"]:
+        parsed_result.http.append(
+            MACOModel.Http(uri=raw_config["C2"],
+                           usage="c2")
+        )
+
+    elif protocol == "FTP":
+        parsed_result.ftp.append(
+            MACOModel.FTP(username=raw_config["Username"],
+                          password=raw_config["Password"],
+                          hostname=raw_config["C2"].replace('ftp://', ''),
+                          usage="c2")
+        )
+
+    elif protocol == "SMTP":
+        parsed_result.smtp.append(
+            MACOModel.SMTP(username=raw_config["Username"],
+                           password=raw_config["Password"],
+                           hostname=raw_config["C2"],
+                           port=raw_config["Port"],
+                           mail_to=[raw_config["EmailTo"]],
+                           usage="c2")
+        )
+    
+    if "Persistence_Filename" in raw_config:
+        # TODO: Not sure if this should go under paths with a 'storage' usage..
+        parsed_result.other["Persistence_Filename"] = raw_config["Persistence_Filename"]
+    
+    if "ExternalIPCheckServices" in raw_config:
+        # TODO: Looks like it should be added to HTTP since it's for requesting the system's public IP
+        parsed_result.other["ExternalIPCheckServices"] = raw_config["ExternalIPCheckServices"]
+    
+
+    return parsed_result
 
 def extract_config(data):
     config_dict = {}
