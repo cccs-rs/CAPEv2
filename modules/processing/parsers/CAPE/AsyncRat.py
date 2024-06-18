@@ -3,12 +3,52 @@
 import base64
 import binascii
 import re
+import os
 import string
 import struct
 from contextlib import suppress
 
 from Cryptodome.Cipher import AES
 from Cryptodome.Protocol.KDF import PBKDF2
+
+from maco.model import ExtractorModel as MACOModel
+
+def convert_to_MACO(raw_config: dict) -> MACOModel:
+    parsed_result = MACOModel(family="AsyncRAT")
+    if not raw_config:
+        return
+
+    # Mutex
+    parsed_result.mutex.append(raw_config["Mutex"])
+
+    # Version
+    parsed_result.version = raw_config["Version"]
+
+    # Was persistence enabled?
+    if raw_config['Install'] == 'true':
+        parsed_result.capability_enabled.append('persistence')
+    else:
+        parsed_result.capability_disabled.append('persistence')
+
+    # Installation Path
+    if raw_config.get('Folder'):
+        parsed_result.paths.append(MACOModel.Path(path=os.path.join(raw_config['Folder'], raw_config['Filename']),
+                                                  usage="install"))
+
+    # C2s
+    for i in range(len(raw_config.get('C2s', []))):
+        parsed_result.http.append(MACOModel.Http(hostname=raw_config["C2s"][i],
+                                                 port=int(raw_config["Ports"][i]),
+                                                 usage="c2"))
+    # Pastebin
+    if raw_config.get("Pastebin") not in ["null", None]:
+        # TODO: Is it used to download the C2 information if not embedded?
+        # Ref: https://www.netskope.com/blog/asyncrat-using-fully-undetected-downloader
+        parsed_result.http.append(MACOModel.Http(uri=raw_config["Pastebin"],
+                                                 usage="download"))
+
+    return parsed_result
+
 
 
 def get_string(data, index, offset):
