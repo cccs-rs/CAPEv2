@@ -21,6 +21,8 @@ import pefile
 import yara
 from Cryptodome.Cipher import ARC4
 
+from maco.model import ExtractorModel as MACOModel
+
 rule_source = """
 rule BitPaymer
 {
@@ -39,6 +41,19 @@ rule BitPaymer
 
 LEN_BLOB_KEY = 40
 
+def convert_to_MACO(raw_config: dict):
+    if not raw_config:
+        return None
+
+    parsed_result = MACOModel(family="BitPaymer")
+    
+    # Extracted strings
+    parsed_result.decoded_strings = raw_config["strings"]
+
+    # Encryption details
+    parsed_result.encryption.append(MACOModel.Encryption(algorithm="rsa",
+                                                         public_key=raw_config['RSA public key']))
+    return parsed_result
 
 def convert_char(c):
     if c in (string.letters + string.digits + string.punctuation + " \t\r\n"):

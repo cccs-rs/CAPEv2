@@ -6,6 +6,8 @@ import json
 import logging
 import re
 
+from maco.model import ExtractorModel as MACOModel
+
 log = logging.getLogger(__name__)
 log.setLevel(logging.INFO)
 
@@ -13,6 +15,26 @@ patterns = [
     rb"[A-Za-z0-9+/]{4}(?:[A-Za-z0-9+/]{4})*(?=[0-9]+)",
     rb"(?:[A-Za-z0-9+/]{4}){2,}(?:[A-Za-z0-9+/]{2}[AEIMQUYcgkosw048]=|[A-Za-z0-9+/][AQgw]==)",
 ]
+
+def convert_to_MACO(raw_config: dict):
+    if not raw_config:
+        return None
+
+    parsed_result = MACOModel(family="AuroraStealer")
+    if raw_config.get('C2'):
+        # IP related to C2
+        parsed_result.http.append(MACOModel.Http(hostname=raw_config['C2'],
+                                                 usage="c2"))
+    
+    # TODO: We may want to update MACO to account for these?
+    # Ref: https://www.esentire.com/blog/esentire-threat-intelligence-malware-analysis-aurora-stealer
+    #parsed_result.other = {k: raw_config[k] for k in ['Loader module', 'Powershell module', 'Grabber'] if raw_config.get(k)}
+
+    # TODO: Unsure what the other possible keys might be and how they should be organized (line 54)
+    # For now we'll assign the entirety of the raw config to other
+    parsed_result.other = raw_config
+
+    return parsed_result
 
 
 def extract_config(data):

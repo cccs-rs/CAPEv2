@@ -14,9 +14,10 @@ from Cryptodome.Protocol.KDF import PBKDF2
 from maco.model import ExtractorModel as MACOModel
 
 def convert_to_MACO(raw_config: dict) -> MACOModel:
-    parsed_result = MACOModel(family="AsyncRAT")
     if not raw_config:
         return
+
+    parsed_result = MACOModel(family="AsyncRAT")
 
     # Mutex
     parsed_result.mutex.append(raw_config["Mutex"])

@@ -17,6 +17,8 @@ import struct
 import pefile
 import yara
 
+from maco.model import ExtractorModel as MACOModel
+
 DESCRIPTION = "Azorult configuration parser."
 AUTHOR = "kevoreilly"
 
@@ -35,6 +37,17 @@ rule Azorult
 """
 
 MAX_STRING_SIZE = 32
+
+def convert_to_MACO(raw_config: dict):
+    if not raw_config:
+        return None
+
+    parsed_result = MACOModel(family="Azorult")
+    
+    # Domain related to C2
+    parsed_result.http.append(MACOModel.Http(hostname=raw_config['address'],
+                                                 usage="c2"))
+    return parsed_result
 
 
 def yara_scan(raw_data, rule_name):

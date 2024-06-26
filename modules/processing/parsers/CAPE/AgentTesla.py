@@ -4,11 +4,12 @@ from lib.cuckoo.common.integrations.strings import extract_strings
 from maco.model import ExtractorModel as MACOModel
 
 def convert_to_MACO(raw_config: dict) -> MACOModel:
-    parsed_result = MACOModel(family="AgentTesla")
     protocol = raw_config.get('Protocol')
     if not protocol:
         return
-    elif protocol == "Telegram":
+
+    parsed_result = MACOModel(family="AgentTesla")
+    if protocol == "Telegram":
         parsed_result.http.append(
             MACOModel.Http(uri=raw_config["C2"],
                            password=raw_config["Password"],

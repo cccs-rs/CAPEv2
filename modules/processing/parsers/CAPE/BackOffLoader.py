@@ -6,7 +6,31 @@ from sys import argv
 import pefile
 from Cryptodome.Cipher import ARC4
 
+from maco.model import ExtractorModel as MACOModel
+
 CFG_START = "1020304050607080"
+
+def convert_to_MACO(raw_config: dict):
+    if not raw_config:
+        return None
+
+    parsed_result = MACOModel(family="BackOffLoader")
+    
+    # Version
+    parsed_result.version = raw_config['Version']
+
+    # Encryption details
+    parsed_result.encryption.append(MACOModel.Encryption(algorithm="rc4",
+                                                         key=raw_config['EncryptionKey'],
+                                                         seed=raw_config['RC4Seed']))
+    for url in raw_config['URLs']:
+        parsed_result.http.append(url=url)
+
+    for key in ["OnDiskConfigKey", "Build"]:
+        # TODO: Review if this should be dumped here
+        parsed_result.other[key] = raw_config[key]
+
+    return parsed_result
 
 
 def RC4(key, data):
