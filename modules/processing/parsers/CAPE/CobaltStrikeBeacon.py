@@ -511,7 +511,7 @@ def beacon_settings_to_maco(output: dict):
                 port = 443 if protocol == "HTTPS" else 80
             user_agent = output.pop("UserAgent", None)
             http_get = {
-                "uri": f"{protocol.lower()}://{c2_domain}{c2_get_path}",
+                "uri": f"{protocol.lower()}://{c2_domain}:{port}{c2_get_path}",
                 "protocol": protocol.lower(),
                 "hostname": c2_domain,
                 "port": port,
@@ -523,7 +523,7 @@ def beacon_settings_to_maco(output: dict):
             http.append(http_get)
             if c2_post_path:
                 http_post = {
-                    "uri": f"{protocol.lower()}://{c2_domain}{c2_get_path}",
+                    "uri": f"{protocol.lower()}://{c2_domain}:{port}{c2_post_path}",
                     "protocol": protocol.lower(),
                     "hostname": c2_domain,
                     "port": port,
